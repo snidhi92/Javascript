@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+	
+</head>
+<style>
+	.outer{
+	width:100px;
+	margin-right:80px;
+	position:relative;
+	display:inline-block;
+}
+.imagesize{
+	width:100px;
+	height:200px;
+	border: 2px solid black;
+}
+.overlay{
+	position:absolute;
+	z-index: 2;
+}
+</style>
+<body>
+	<button onclick="start()">Start Again</button></br>
+	<div id="ddsample"></div>
+</body>
+<script>
+	var numbersArray=["https://i.ibb.co/1bPyBNx/1-blue.jpg",
+					  "https://i.ibb.co/5k4cDYm/1-green.jpg",
+					  "https://i.ibb.co/ZGJDKmt/1-red.jpg",
+					  "https://i.ibb.co/S5bRz8n/2-blue.jpg",
+					  "https://i.ibb.co/gm12HXN/2-green.jpg",
+					  "https://i.ibb.co/VWnvwqM/2-red.jpg",
+					  "https://i.ibb.co/ssCTJkr/3-blue.jpg",
+					  "https://i.ibb.co/5hGS3bx/3-green.jpg",
+					  "https://i.ibb.co/cwwg3X4/3-red.jpg",
+					  "https://i.ibb.co/3W5YvMg/4-blue.jpg",
+					  "https://i.ibb.co/W0mTkdc/4-green.jpg",
+					  "https://i.ibb.co/1Kphcg9/4-red.jpg"
+					];
+		
+	var block1=[];
+	var block2=[];
+	var block3=[];
+	let blockstr;
+	let blockdrop;
+	function start(){
+		var tempNumbers=[...numbersArray];	// duplicate created using spread operstor
+		var shuffledNumbers=[];				// created empty array
+	
+		for(var i=0;i<numbersArray.length;i++){
+			var ransome=Math.floor(Math.random() * (tempNumbers.length)); // generate number 
+			shuffledNumbers.push(tempNumbers[ransome]);
+			tempNumbers.splice(ransome,1);	// remove 1 elements from index ransome
+		}
+		
+		block1=new Array(4);
+		block2=new Array(4);
+		block3=new Array(4);
+		var j=0;
+		var i=0;
+		for(;i<shuffledNumbers.length;i++){
+			if(i<block1.length)
+				block1[i]=shuffledNumbers[i];
+			else
+				break;
+		}
+		
+		for(;i<shuffledNumbers.length;i++){
+			if(j<block2.length)
+				block2[j]=shuffledNumbers[i];
+			else
+				break;
+			j++;
+		}
+		
+		j=0;
+		for(;i<shuffledNumbers.length;i++){
+			if(j<block3.length)
+				block3[j]=shuffledNumbers[i];
+			else 
+				break;
+			j++;
+		}
+		show();
+	}
+	
+	//------------------------
+	
+	let dragImageIndex=-1;
+	
+	function allowDrop(ev){
+		ev.preventDefault();
+	}
+	function drag(ev,dragIndex, blockname){
+		blockstr= 'block'+blockname;
+		console.log('Dragging Block', blockstr)
+		dragImageIndex=dragIndex;
+	}
+	
+	function drop(ev,dropIndex, blockname){
+		ev.preventDefault();
+		let jsons=[{name:'block1', list:block1},{name:'block2', list:block2},{name:'block3', list:block3}];
+		let list1;
+		let list2;
+		blockdrop= 'block'+blockname;
+		jsons.map(obj=>{
+			if(obj.name===blockstr)
+				list1= obj.list;
+			if(obj.name===blockdrop)
+				list2= obj.list
+		});
+		
+		list2.push(list1[dragImageIndex]);
+		list1.splice(dragImageIndex,1);
+		dragImageIndex=-1;
+		show();
+	}
+	
+	function showDropDragImage(myIndex,img,blocks){
+		let styles="top:"+myIndex*40+"px";
+		
+		
+			return "<img class='imagesize overlay' src='" + img + "'"+ " style='"+styles+"'"+
+				" ondrop='drop(event," +myIndex + ","+blocks+")'" + " draggable='true'" + " ondragstart='drag(event," + myIndex + ","+blocks+")'"+ 
+				" ondragover='allowDrop(event)'/>";
+		
+		
+	}	
+	// printing all cards in vertical manner 
+	function show(){
+		let str="";
+		str=str+"<div class='outer'>";
+		for(let i=0;i<block1.length;i++)
+			str=str+showDropDragImage(i,block1[i],"1");
+		str=str+"</div>";
+		//----------------------------
+		str=str+"<div class='outer'>";
+		for(let i=0;i<block2.length;i++)
+			str=str+showDropDragImage(i,block2[i],"2");
+		str=str+"</div>";
+		//----------------------------
+		str=str+"<div class='outer'>";
+		for(let i=0;i<block3.length;i++)
+			str=str+showDropDragImage(i,block3[i],"3");
+		str=str+"</div>";
+		
+		let div1=document.getElementById("ddsample");
+		div1.innerHTML=str;
+	}
+</script>
+</head>
+</html>
